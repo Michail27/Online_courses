@@ -72,11 +72,23 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'OnlineCourses.wsgi.application'
 
+
 REST_FRAMEWORK = {
-    'DEFAULT_PERMISSION_CLASSES': [
-        'rest_framework.permissions.IsAuthenticated',
-    ]
+   'DEFAULT_AUTHENTICATION_CLASSES': (
+       'rest_framework.authentication.SessionAuthentication',
+   ),
 }
+
+
+
+
+
+
+
+
+
+
+
 
 # Database
 # https://docs.djangoproject.com/en/3.2/ref/settings/#databases

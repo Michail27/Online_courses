@@ -6,6 +6,7 @@ from clases.models import ProfileUser
 class RegisterSerializers(ModelSerializer):
     class Meta:
         model = ProfileUser
+        # name = {'required': True}
         fields = ('id', 'username', 'password', 'email', 'role')
         extra_kwargs = {'role': {'required': True}, }
 
@@ -15,3 +16,9 @@ class RegisterSerializers(ModelSerializer):
                                                password=validated_date['password'],
                                                role=validated_date['role'],)
         return user
+
+
+class LoginSerializers(ModelSerializer):
+    class Meta:
+        model = ProfileUser
+        fields = ['username', 'password']
