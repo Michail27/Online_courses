@@ -6,7 +6,6 @@ from clases.models import ProfileUser
 class RegisterSerializers(ModelSerializer):
     class Meta:
         model = ProfileUser
-        # name = {'required': True}
         fields = ('id', 'username', 'password', 'email', 'role')
         extra_kwargs = {'role': {'required': True}, }
 
