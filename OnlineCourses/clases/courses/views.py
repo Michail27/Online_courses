@@ -1,5 +1,5 @@
 from rest_framework import status
-from rest_framework.generics import ListCreateAPIView, RetrieveUpdateDestroyAPIView, DestroyAPIView, ListAPIView
+from rest_framework.generics import ListCreateAPIView, RetrieveUpdateDestroyAPIView
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
@@ -14,8 +14,8 @@ class CourseList(ListCreateAPIView):
 
     def get_queryset(self):
         if self.request.user.role == 'teacher':
-            return Course.objects.filter(teacher_owner=self.request.user.id)
-        return Course.objects.all()
+            return Course.objects.all()
+        return Course.objects.filter(students=self.request.user.id)
 
 
 class CourseDetail(RetrieveUpdateDestroyAPIView):
@@ -26,7 +26,13 @@ class CourseDetail(RetrieveUpdateDestroyAPIView):
     def get_object(self):
         if Course.objects.get(pk=self.kwargs['course_id']).teacher_owner_id == self.request.user.id:
             return Course.objects.get(pk=self.kwargs['course_id'], teacher_owner=self.request.user)
-        return Course.objects.get(pk=self.kwargs['course_id'])
+        elif Course.objects.get(pk=self.kwargs['course_id']) in Course.objects.filter(students=self.request.user.id):
+            return Course.objects.get(pk=self.kwargs['course_id'])
+        elif Course.objects.get(pk=self.kwargs['course_id']) in Course.objects.filter(teachers=self.request.user.id):
+            return Course.objects.get(pk=self.kwargs['course_id'])
+
+
+
 
     def put(self, request, *args, **kwargs):
         course = Course.objects.get(pk=self.kwargs['course_id'], teacher_owner=self.request.user)

@@ -25,3 +25,21 @@ class Lecture(models.Model):
 
     def __str__(self):
         return self.topic_lecture
+
+
+class Homework(models.Model):
+    task = models.TextField(blank=False)
+    tasks_owner = models.ForeignKey(ProfileUser, on_delete=models.CASCADE,  related_name='tasks')
+    lecture = models.ForeignKey(Lecture, on_delete=models.CASCADE, blank=False, related_name='tasks')
+
+    def __str__(self):
+        return self.task
+
+
+class Solution(models.Model):
+    text = models.TextField()
+    student = models.ForeignKey(ProfileUser, on_delete=models.CASCADE, related_name='solution')
+    homework = models.ForeignKey(Homework, on_delete=models.CASCADE, related_name='solution')
+
+    def __str__(self):
+        return self.text
