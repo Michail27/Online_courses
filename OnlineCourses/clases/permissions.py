@@ -15,7 +15,8 @@ class IsStudent(BasePermission):
     def has_permission(self, request, view):
         if request.method in permissions.SAFE_METHODS:
             return True
-        return request.user.role == 'student'
+        course = Course.objects.get(id=view.kwargs['course_id'])
+        return request.user in course.students.all()
 
 
 class IsOwner(BasePermission):

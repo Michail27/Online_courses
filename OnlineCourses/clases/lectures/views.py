@@ -24,10 +24,15 @@ class LectureList(ListCreateAPIView):
         elif Course.objects.get(pk=self.kwargs['course_id']) in Course.objects.filter(teachers=self.request.user.id):
             return Lecture.objects.filter(lecture_owner=self.request.user)
 
-
-def post(self, request, *args, **kwargs):
-        self.create(request, *args, **kwargs)
-        return Response('Lecture create', status=status.HTTP_201_CREATED)
+    def post(self, request, *args, **kwargs):
+        serializer = LectureSerializer(data={'topic_lecture': request.data['topic_lecture'],
+                                             'presentation': request.data['presentation'],
+                                             'lecture_owner': request.user.id,
+                                             'course': kwargs['course_id']})
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 class LectureDetail(RetrieveUpdateDestroyAPIView):

@@ -3,6 +3,7 @@ from django.urls import path
 from clases.courses.views import CourseList, CourseDetail
 from clases.homework.views import HomeworkList, HomeworkDetail
 from clases.lectures.views import LectureList, LectureDetail
+from clases.solution.views import SolutionList, SolutionDetail
 from clases.views import Register, Login, logout_user
 
 urlpatterns = [
@@ -18,5 +19,10 @@ urlpatterns = [
 
     path('courses/<int:course_id>/lectures/<int:lecture_id>/homework/', HomeworkList.as_view()),
     path('courses/<int:course_id>/lectures/<int:lecture_id>/homework/<int:homework_id>/', HomeworkDetail.as_view()),
+
+    path('courses/<int:course_id>/lectures/<int:lecture_id>/homework/<int:homework_id>/solution/',
+         SolutionList.as_view()),
+    path('courses/<int:course_id>/lectures/<int:lecture_id>/homework/<int:homework_id>/solution/<int:solution_id>/',
+         SolutionDetail.as_view())
 ]
 

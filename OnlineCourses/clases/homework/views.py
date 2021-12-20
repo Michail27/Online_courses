@@ -6,8 +6,8 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
 from clases.homework.serializers import HomeworkSerializer
-from clases.lectures.serializers import LectureSerializer
-from clases.models import Course, Lecture, Homework
+
+from clases.models import Course, Homework
 from clases.permissions import IsTeacherCourse
 
 
@@ -25,8 +25,13 @@ class HomeworkList(ListCreateAPIView):
             return Homework.objects.filter(lecture=self.kwargs['lecture_id'])
 
     def post(self, request, *args, **kwargs):
-        self.create(request, *args, **kwargs)
-        return Response('Task add', status=status.HTTP_201_CREATED)
+        serializer = HomeworkSerializer(data={'task': request.data['task'],
+                                              'tasks_owner': request.user.id,
+                                              'lecture': kwargs['lecture_id']})
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 class HomeworkDetail(RetrieveUpdateDestroyAPIView):

@@ -1,16 +1,15 @@
 from rest_framework import serializers
 
-from clases.models import Homework
+from clases.models import Solution
 
 
-class HomeworkSerializer(serializers.ModelSerializer):
+class SolutionSerializer(serializers.ModelSerializer):
 
     class Meta:
-        model = Homework
+        model = Solution
         fields = '__all__'
 
     def update(self, instance, validated_data):
-        instance.task = validated_data['task']
+        instance.text = validated_data['text']
         instance.save()
         return instance
-

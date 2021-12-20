@@ -22,4 +22,9 @@ class CourseSerializer(serializers.ModelSerializer):
         course.save()
         return course
 
-
+    def update(self, instance, validated_data):
+        instance.name = validated_data['name']
+        instance.teachers.set(validated_data.get('teachers', instance.teachers.all()))
+        instance.students.set(validated_data.get('students', instance.students.all()))
+        instance.save()
+        return instance
