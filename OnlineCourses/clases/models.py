@@ -43,3 +43,12 @@ class Solution(models.Model):
 
     def __str__(self):
         return self.text
+
+
+class Mark(models.Model):
+    mark = models.IntegerField()
+    teacher = models.ForeignKey(ProfileUser, on_delete=models.CASCADE, related_name='mark')
+    solution = models.ForeignKey(Solution, on_delete=models.CASCADE, related_name='mark')
+
+    def __str__(self):
+        return self.mark

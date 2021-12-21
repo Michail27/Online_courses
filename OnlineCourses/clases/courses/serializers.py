@@ -14,6 +14,8 @@ class CourseSerializer(serializers.ModelSerializer):
         fields = ['id', 'name', 'teacher_owner', 'teachers', 'students']
 
     def create(self, validated_data):
+        request = self.context['request']
+        validated_data['teacher_owner'] = request.user
         course = Course(name=validated_data.get('name'), teacher_owner=validated_data.get('teacher_owner'))
         course.save()
         course.teachers.set(validated_data.get('teachers', []))

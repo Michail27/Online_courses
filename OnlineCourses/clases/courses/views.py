@@ -3,6 +3,7 @@ from rest_framework.generics import ListCreateAPIView, RetrieveUpdateDestroyAPIV
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
+from clases.BaseExeption import ContentNotFound
 from clases.courses.serializers import CourseSerializer
 from clases.models import Course
 from clases.permissions import IsTeacher, IsOwner
@@ -28,13 +29,11 @@ class CourseDetail(RetrieveUpdateDestroyAPIView):
             return Course.objects.get(pk=self.kwargs['course_id'], teacher_owner=self.request.user)
         elif Course.objects.get(pk=self.kwargs['course_id']) in Course.objects.filter(students=self.request.user.id):
             return Course.objects.get(pk=self.kwargs['course_id'])
-        elif Course.objects.get(pk=self.kwargs['course_id']) in Course.objects.filter(students=self.request.user.id):
-            return Course.objects.get(pk=self.kwargs['course_id'])
 
     def put(self, request, *args, **kwargs):
         course = Course.objects.get(pk=self.kwargs['course_id'], teacher_owner=self.request.user)
         serializer = CourseSerializer(data=request.data, instance=course)
         if serializer.is_valid():
             serializer.save()
-            return Response(serializer.data, status=status.HTTP_200_OK)
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
