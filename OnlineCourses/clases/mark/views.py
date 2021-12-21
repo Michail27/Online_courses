@@ -1,14 +1,14 @@
 from rest_framework import status
 from rest_framework.authentication import SessionAuthentication
-from rest_framework.generics import ListCreateAPIView, RetrieveUpdateDestroyAPIView
+from rest_framework.generics import ListCreateAPIView
 from rest_framework.permissions import IsAuthenticated
 
 from rest_framework.response import Response
 
+from clases.BaseExeption import ContentNotFound
 from clases.mark.serializers import MarkSerializer
 from clases.models import Course, Solution, Mark
-from clases.permissions import IsStudent, IsTeacherCourse
-from clases.solution.serializers import SolutionSerializer
+from clases.permissions import IsTeacherCourse
 
 
 class MarkList(ListCreateAPIView):
@@ -18,15 +18,11 @@ class MarkList(ListCreateAPIView):
 
     def get_queryset(self):
         if Course.objects.get(pk=self.kwargs['course_id']) in Course.objects.filter(teachers=self.request.user.id):
-            return Mark.objects.filter(solution=self.kwargs['solution_id'],
-                                       solution__homework=self.kwargs['homework_id'],
-                                       solution__homework__lecture=self.kwargs['lecture_id'],
-                                       solution__homework__lecture__course=self.kwargs['course_id'])
+            return Mark.objects.filter(solution=self.kwargs['solution_id'])
         elif self.request.user.id == Solution.objects.get(pk=self.kwargs['solution_id']).student.id:
-            return Mark.objects.filter(solution=self.kwargs['solution_id'],
-                                       solution__homework=self.kwargs['homework_id'],
-                                       solution__homework__lecture=self.kwargs['lecture_id'],
-                                       solution__homework__lecture__course=self.kwargs['course_id'])
+            return Mark.objects.filter(solution=self.kwargs['solution_id'])
+        else:
+            raise ContentNotFound({"error": ["You cannot view this mark"]})
 
     def post(self, request, *args, **kwargs):
         serializer = MarkSerializer(data={'mark': request.data['mark'], 'teacher': request.user.id,

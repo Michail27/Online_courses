@@ -52,3 +52,12 @@ class Mark(models.Model):
 
     def __str__(self):
         return self.mark
+
+
+class Comment(models.Model):
+    comment = models.TextField()
+    user = models.ForeignKey(ProfileUser, on_delete=models.CASCADE, related_name='comment')
+    mark = models.ForeignKey(Mark, on_delete=models.CASCADE, related_name='comment')
+
+    def __str__(self):
+        return self.comment

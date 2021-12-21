@@ -29,6 +29,8 @@ class CourseDetail(RetrieveUpdateDestroyAPIView):
             return Course.objects.get(pk=self.kwargs['course_id'], teacher_owner=self.request.user)
         elif Course.objects.get(pk=self.kwargs['course_id']) in Course.objects.filter(students=self.request.user.id):
             return Course.objects.get(pk=self.kwargs['course_id'])
+        else:
+            raise ContentNotFound({"error": ["You are not a member of this course"]})
 
     def put(self, request, *args, **kwargs):
         course = Course.objects.get(pk=self.kwargs['course_id'], teacher_owner=self.request.user)

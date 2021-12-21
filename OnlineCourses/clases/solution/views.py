@@ -5,6 +5,7 @@ from rest_framework.permissions import IsAuthenticated
 
 from rest_framework.response import Response
 
+from clases.BaseExeption import ContentNotFound
 from clases.models import Course, Solution
 from clases.permissions import IsStudent
 from clases.solution.serializers import SolutionSerializer
@@ -17,14 +18,11 @@ class SolutionList(ListCreateAPIView):
 
     def get_queryset(self):
         if Course.objects.get(pk=self.kwargs['course_id']) in Course.objects.filter(teachers=self.request.user.id):
-            return Solution.objects.filter(homework=self.kwargs['homework_id'],
-                                           homework__lecture=self.kwargs['lecture_id'],
-                                           homework__lecture__course=self.kwargs['course_id'])
+            return Solution.objects.filter(homework=self.kwargs['homework_id'])
         elif Course.objects.get(pk=self.kwargs['course_id']) in Course.objects.filter(students=self.request.user.id):
-            return Solution.objects.filter(student=self.request.user,
-                                           homework=self.kwargs['homework_id'],
-                                           homework__lecture=self.kwargs['lecture_id'],
-                                           homework__lecture__course=self.kwargs['course_id'])
+            return Solution.objects.filter(student=self.request.user, homework=self.kwargs['homework_id'])
+        else:
+            raise ContentNotFound({"error": ["You don't have access to send solution"]})
 
     def post(self, request, *args, **kwargs):
         serializer = SolutionSerializer(data={'text': request.data['text'], 'student': request.user.id,
@@ -45,6 +43,8 @@ class SolutionDetail(RetrieveUpdateDestroyAPIView):
             return Solution.objects.get(id=self.kwargs['solution_id'])
         elif Course.objects.get(pk=self.kwargs['course_id']) in Course.objects.filter(teachers=self.request.user.id):
             return Solution.objects.get(id=self.kwargs['solution_id'])
+        else:
+            raise ContentNotFound({"error": ["You cannot view this solution"]})
 
 #
     def put(self, request, *args, **kwargs):
@@ -52,6 +52,5 @@ class SolutionDetail(RetrieveUpdateDestroyAPIView):
         serializer = SolutionSerializer(data=request.data, instance=solution)
         if serializer.is_valid():
             serializer.save()
-            return Response(serializer.data, status=status.HTTP_200_OK)
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
