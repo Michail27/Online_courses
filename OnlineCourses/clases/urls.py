@@ -33,4 +33,3 @@ urlpatterns = [
     path('courses/<int:course_id>/lectures/<int:lecture_id>/homework/<int:homework_id>/solution/<int:solution_id>/'
          'mark/<int:mark_id>/comments/', CommentList.as_view())
 ]
-

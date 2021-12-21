@@ -46,7 +46,6 @@ class SolutionDetail(RetrieveUpdateDestroyAPIView):
         else:
             raise ContentNotFound({"error": ["You cannot view this solution"]})
 
-#
     def put(self, request, *args, **kwargs):
         solution = Solution.objects.get(id=self.kwargs['solution_id'])
         serializer = SolutionSerializer(data=request.data, instance=solution)
