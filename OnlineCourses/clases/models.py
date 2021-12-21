@@ -51,7 +51,7 @@ class Mark(models.Model):
     solution = models.ForeignKey(Solution, on_delete=models.CASCADE, related_name='mark')
 
     def __str__(self):
-        return self.mark
+        return str(self.mark)
 
 
 class Comment(models.Model):
@@ -61,3 +61,4 @@ class Comment(models.Model):
 
     def __str__(self):
         return self.comment
+
