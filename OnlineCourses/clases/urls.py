@@ -19,8 +19,9 @@ urlpatterns = [
     path('courses/<int:course_id>/lectures/', LectureList.as_view(), name='lectures_list'),
     path('courses/<int:course_id>/lectures/<int:lecture_id>/', LectureDetail.as_view(), name='lecture'),
 
-    path('courses/<int:course_id>/lectures/<int:lecture_id>/homework/', HomeworkList.as_view()),
-    path('courses/<int:course_id>/lectures/<int:lecture_id>/homework/<int:homework_id>/', HomeworkDetail.as_view()),
+    path('courses/<int:course_id>/lectures/<int:lecture_id>/homework/', HomeworkList.as_view(), name='homework_list'),
+    path('courses/<int:course_id>/lectures/<int:lecture_id>/homework/<int:homework_id>/', HomeworkDetail.as_view(),
+         name='homework'),
 
     path('courses/<int:course_id>/lectures/<int:lecture_id>/homework/<int:homework_id>/solution/',
          SolutionList.as_view()),
