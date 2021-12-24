@@ -1,9 +1,10 @@
+from django.http import Http404
 from rest_framework import status
 from rest_framework.generics import ListCreateAPIView, RetrieveUpdateDestroyAPIView
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
-from clases.BaseExeption import ContentNotFound
+
 from clases.courses.serializers import CourseSerializer
 from clases.models import Course
 from clases.permissions import IsTeacher, IsOwner
@@ -30,7 +31,7 @@ class CourseDetail(RetrieveUpdateDestroyAPIView):
         elif Course.objects.get(pk=self.kwargs['course_id']) in Course.objects.filter(students=self.request.user.id):
             return Course.objects.get(pk=self.kwargs['course_id'])
         else:
-            raise ContentNotFound({"error": ["You are not a member of this course"]})
+            raise Http404
 
     def put(self, request, *args, **kwargs):
         course = Course.objects.get(pk=self.kwargs['course_id'], teacher_owner=self.request.user)

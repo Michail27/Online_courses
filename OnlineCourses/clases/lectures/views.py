@@ -1,3 +1,4 @@
+from django.http import Http404
 from rest_framework import status
 from rest_framework.authentication import SessionAuthentication
 from rest_framework.generics import ListCreateAPIView, RetrieveUpdateDestroyAPIView
@@ -5,7 +6,6 @@ from rest_framework.permissions import IsAuthenticated
 
 from rest_framework.response import Response
 
-from clases.BaseExeption import ContentNotFound
 from clases.lectures.serializers import LectureSerializer
 from clases.models import Course, Lecture
 from clases.permissions import IsTeacherCourse
@@ -23,7 +23,7 @@ class LectureList(ListCreateAPIView):
         elif Course.objects.get(pk=self.kwargs['course_id']) in Course.objects.filter(students=self.request.user.id):
             return Lecture.objects.filter(course=self.kwargs['course_id'])
         else:
-            raise ContentNotFound({"error": ["You don't have access to these lectures"]})
+            raise Http404
 
     def post(self, request, *args, **kwargs):
         serializer = LectureSerializer(data={'topic_lecture': request.data['topic_lecture'],
@@ -47,7 +47,7 @@ class LectureDetail(RetrieveUpdateDestroyAPIView):
         elif Course.objects.get(pk=self.kwargs['course_id']) in Course.objects.filter(students=self.request.user.id):
             return Lecture.objects.get(pk=self.kwargs['lecture_id'])
         else:
-            raise ContentNotFound({"error": ["You don't have access to this lecture"]})
+            raise Http404
 
     def put(self, request, *args, **kwargs):
         lecture = Lecture.objects.get(pk=self.kwargs['lecture_id'])

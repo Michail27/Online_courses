@@ -1,3 +1,4 @@
+from django.http import Http404
 from rest_framework import status
 from rest_framework.authentication import SessionAuthentication
 from rest_framework.generics import ListCreateAPIView, RetrieveUpdateDestroyAPIView
@@ -5,7 +6,6 @@ from rest_framework.permissions import IsAuthenticated
 
 from rest_framework.response import Response
 
-from clases.BaseExeption import ContentNotFound
 from clases.homework.serializers import HomeworkSerializer
 
 from clases.models import Course, Homework
@@ -23,7 +23,7 @@ class HomeworkList(ListCreateAPIView):
         elif Course.objects.get(pk=self.kwargs['course_id']) in Course.objects.filter(students=self.request.user.id):
             return Homework.objects.filter(lecture=self.kwargs['lecture_id'])
         else:
-            raise ContentNotFound({"error": ["You don't have access to these tasks"]})
+            raise Http404
 
     def post(self, request, *args, **kwargs):
         serializer = HomeworkSerializer(data={'task': request.data['task'],
@@ -46,7 +46,7 @@ class HomeworkDetail(RetrieveUpdateDestroyAPIView):
         elif Course.objects.get(pk=self.kwargs['course_id']) in Course.objects.filter(students=self.request.user.id):
             return Homework.objects.get(pk=self.kwargs['homework_id'])
         else:
-            raise ContentNotFound({"error": ["You don't have access to this task"]})
+            raise Http404
 
     def put(self, request, *args, **kwargs):
         task = Homework.objects.get(pk=self.kwargs['homework_id'])

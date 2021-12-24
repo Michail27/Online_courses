@@ -1,17 +1,17 @@
-from django.test import TestCase, TransactionTestCase
-from rest_framework.reverse import reverse
-
-from clases.models import ProfileUser
+from django.test import TransactionTestCase
+from django.urls import reverse
+from clases.models import ProfileUser, Course
 
 
 class TestMyAppPlease(TransactionTestCase):
     def setUp(self):
-        data = {'username': 'student1', 'password': 'useruser', 'email': 'asd@sdv.ru', 'role': 'student'}
-        self.user = ProfileUser.objects.create_user(data)
-        data1 = {'username': 'user', 'password': 'useruser', 'email': 'asd@sdv1.ru', 'role': 'teacher'}
-        self.user1 = ProfileUser.objects.create_user(data1)
-        data2 = {'username': 'student2', 'password': 'useruser', 'email': 'asd@sdv2.ru', 'role': 'student'}
-        self.user2 = ProfileUser.objects.create_user(data2)
+        url = reverse('register')
+        data = {'username': 'student', 'password': 'useruser', 'email': 'asd@sdv.ru', 'role': 'student'}
+        self.user = self.client.post(url, data)
+        data1 = {'username': 'student1', 'password': 'useruser', 'email': 'asd@sdv.ru', 'role': 'student'}
+        self.user1 = self.client.post(url, data1)
+        data3 = {'username': 'teacher', 'password': 'useruser', 'email': 'asd@sdv.ru', 'role': 'teacher'}
+        self.user2 = self.client.post(url, data3)
 
     def test_register(self):
         url = reverse('register')
@@ -44,7 +44,6 @@ class TestMyAppPlease(TransactionTestCase):
         response = self.client.post(url, data)
         self.assertEqual(response.status_code, 400, msg='is not redirect')
 
-
     def test_login_logout(self):
         url = reverse('register')
         data = {
@@ -65,35 +64,34 @@ class TestMyAppPlease(TransactionTestCase):
 
         url = reverse('login')
         data = {
-            'username': 'user',
+            'username': 'user2',
             'password': 'useruser'}
+
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 405, msg='method is not allowed')
         response = self.client.post(url, data)
-        self.assertEqual(response.status_code, 401, msg='is not login')
-        data = {
-            'username': 'user1',
-            'password': 'useruser'}
-        response = self.client.post(url, data)
-        self.assertEqual(response.status_code, 200, msg='is not login')
+        self.assertEqual(response.status_code, 200, msg='is not redirect')
 
         url = reverse('logout')
         self.client.post(url)
+        self.assertEqual(response.status_code, 200, msg='logout')
 
     def test_courses(self):
-        url = reverse('register')
-        data = {
-            'username': 'user1',
-            'password': 'useruser',
-            'email': 'asd@sdv.ru',
-            'role': 'student'
-        }
+        url = reverse('login')
+        data = {'username': 'student', 'password': 'useruser'}
         self.client.post(url, data)
-        data = {
-            'username': 'user2',
-            'password': 'useruser',
-            'email': 'asd@sdv.ru',
-            'role': 'teacher'
-        }
+        url = reverse('courses_list')
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200, msg='is not list courses')
+        url = reverse('login')
+        data = {'username': 'teacher', 'password': 'useruser'}
         self.client.post(url, data)
-
+        data = {'name': 'course', 'teacher_owner': 'teacher', 'teachers': 'teacher', 'students': 'student'}
+        url = reverse('courses_list')
+        self.client.post(url, data)
+        # self.assertTrue(Course.objects.exists(), msg='course is not created')
+        course = Course.objects.first()
+        self.assertEqual(course.username, data['name'], msg='not equal')
+        self.assertEqual(response.status_code, 201, msg='is not created')
 
 

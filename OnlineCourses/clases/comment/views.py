@@ -1,3 +1,4 @@
+from django.http import Http404
 from rest_framework import status
 from rest_framework.authentication import SessionAuthentication
 from rest_framework.generics import ListCreateAPIView
@@ -5,7 +6,7 @@ from rest_framework.permissions import IsAuthenticated
 
 from rest_framework.response import Response
 
-from clases.BaseExeption import ContentNotFound
+
 from clases.comment.serializers import CommentSerializer
 
 from clases.models import Course, Comment, Solution
@@ -23,7 +24,7 @@ class CommentList(ListCreateAPIView):
         elif self.request.user.id == Solution.objects.filter(pk=self.kwargs['solution_id']).get().student.id:
             return Comment.objects.filter(mark=self.kwargs['mark_id'])
         else:
-            raise ContentNotFound({"error": ["You don't have access to these Comments"]})
+            raise Http404
 
     def post(self, request, *args, **kwargs):
         serializer = CommentSerializer(data={'comment': request.data['comment'],

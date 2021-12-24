@@ -1,3 +1,4 @@
+from django.http import Http404
 from rest_framework import status
 from rest_framework.authentication import SessionAuthentication
 from rest_framework.generics import ListCreateAPIView, RetrieveUpdateDestroyAPIView
@@ -5,7 +6,6 @@ from rest_framework.permissions import IsAuthenticated
 
 from rest_framework.response import Response
 
-from clases.BaseExeption import ContentNotFound
 from clases.models import Course, Solution
 from clases.permissions import IsStudent
 from clases.solution.serializers import SolutionSerializer
@@ -22,7 +22,7 @@ class SolutionList(ListCreateAPIView):
         elif Course.objects.get(pk=self.kwargs['course_id']) in Course.objects.filter(students=self.request.user.id):
             return Solution.objects.filter(student=self.request.user, homework=self.kwargs['homework_id'])
         else:
-            raise ContentNotFound({"error": ["You don't have access to send solution"]})
+            raise Http404
 
     def post(self, request, *args, **kwargs):
         serializer = SolutionSerializer(data={'text': request.data['text'], 'student': request.user.id,
@@ -44,7 +44,7 @@ class SolutionDetail(RetrieveUpdateDestroyAPIView):
         elif Course.objects.get(pk=self.kwargs['course_id']) in Course.objects.filter(teachers=self.request.user.id):
             return Solution.objects.get(id=self.kwargs['solution_id'])
         else:
-            raise ContentNotFound({"error": ["You cannot view this solution"]})
+            raise Http404
 
     def put(self, request, *args, **kwargs):
         solution = Solution.objects.get(id=self.kwargs['solution_id'])
